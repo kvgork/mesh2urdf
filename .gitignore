@@ -1,8 +1,55 @@
+# Python
 __pycache__/
 *.py[cod]
+*.pyd
+*.pyo
+.Python
 *.egg-info/
-.pixi/
+*.egg
+.eggs/
 dist/
 build/
+.venv/
+venv/
+env/
+
+# Pixi
+.pixi/
+pixi.lock
+
+# Testing & coverage
 .pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Linting
 .ruff_cache/
+.mypy_cache/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Project-specific: orchestration/planning artifacts
+.agent-state/
+project-context/
+system-improvements.md
+
+# Environment
+.env
+.env.local
+.env.*.local
