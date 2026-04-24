@@ -16,6 +16,8 @@ import {
   init as initUI,
   showPrimitiveEditor,
   updatePrimitiveEditorSpec,
+  updateLinkDropdowns,
+  addJointToList,
 } from './ui.js';
 import {
   createPrimitiveOverlay,
@@ -24,6 +26,7 @@ import {
   disposePrimitiveOverlay,
   applySpecPose,
 } from './primitives.js';
+import { URDFModel } from './urdf_model.js';
 
 const state = {
   meshes: {},        // mesh_id -> { name, threeObj, bbox_min, bbox_max }
@@ -34,6 +37,7 @@ const state = {
 };
 
 let linkCounter = 0;
+const urdfModel = new URDFModel();
 
 // ---------------------------------------------------------------------------
 // Primitive fitting
@@ -77,6 +81,12 @@ async function fitPrimitive(linkName, primitiveType) {
 
     setTransformTarget(visual);
     updatePrimitiveEditorSpec(spec);
+
+    // Sync primitive into URDFModel
+    if (urdfModel.links.has(linkName)) {
+      urdfModel.updateLink(linkName, { primitive: spec });
+    }
+
     showToast(`Fitted ${primitiveType} to ${linkName}`, 'success');
   } catch (e) {
     showToast('Fit error: ' + e.message, 'error');
@@ -120,6 +130,9 @@ function selectLink(linkName) {
       const overlay = state.linkOverlays[linkName];
       if (overlay && link.primitive) {
         updateCollisionOverlay(overlay.collision, link.primitive, m);
+      }
+      if (urdfModel.links.has(linkName)) {
+        urdfModel.updateLink(linkName, { collision_margin: m });
       }
     },
     onDimensionChange: (_dims) => {
@@ -177,7 +190,7 @@ async function uploadMesh(file) {
     focusCameraOn(threeObj);
 
     state.meshes[data.mesh_id] = { name: linkName, threeObj, bbox_min: data.bbox_min, bbox_max: data.bbox_max };
-    state.links.push({
+    const linkState = {
       name: linkName,
       mesh_id: data.mesh_id,
       mesh_filename: file.name,
@@ -185,9 +198,21 @@ async function uploadMesh(file) {
       primitive: null,
       visualOverlay: null,
       collisionOverlay: null,
+    };
+    state.links.push(linkState);
+
+    // Register link in URDF model
+    urdfModel.addLink({
+      name: linkName,
+      mesh_filename: file.name,
+      primitive: null,
+      collision_margin: 0.05,
+      origin_xyz: [0.0, 0.0, 0.0],
+      origin_rpy: [0.0, 0.0, 0.0],
     });
 
     addLinkToSidebar(linkName, selectLink);
+    updateLinkDropdowns(urdfModel.getLinkNames());
     showToast(`Loaded ${file.name} as ${linkName}`, 'success');
 
     // Clear input so same file can be re-uploaded
@@ -204,6 +229,114 @@ async function uploadMesh(file) {
 }
 
 // ---------------------------------------------------------------------------
+// Joint creation
+// ---------------------------------------------------------------------------
+
+function _wireJointForm() {
+  const typeSelect = document.getElementById('joint-type');
+  const axisRow = document.getElementById('joint-axis-row');
+
+  typeSelect.addEventListener('change', (e) => {
+    const needsAxis = e.target.value !== 'fixed';
+    axisRow.style.display = needsAxis ? 'block' : 'none';
+  });
+
+  document.getElementById('add-joint-btn').addEventListener('click', () => {
+    const name = document.getElementById('joint-name').value.trim();
+    const type = document.getElementById('joint-type').value;
+    const parent = document.getElementById('joint-parent').value;
+    const child = document.getElementById('joint-child').value;
+
+    if (!name || !parent || !child) {
+      showToast('Fill in all joint fields', 'error');
+      return;
+    }
+
+    const axis = type !== 'fixed' ? [
+      parseFloat(document.getElementById('axis-x').value) || 0,
+      parseFloat(document.getElementById('axis-y').value) || 0,
+      parseFloat(document.getElementById('axis-z').value) || 1,
+    ] : null;
+
+    const spec = {
+      name,
+      type,
+      parent,
+      child,
+      origin_xyz: [0.0, 0.0, 0.0],
+      origin_rpy: [0.0, 0.0, 0.0],
+      axis,
+      limit: null,
+    };
+
+    try {
+      urdfModel.addJoint(spec);
+    } catch (e) {
+      showToast(e.message, 'error');
+      return;
+    }
+
+    addJointToList(name, type, parent, child, (removedName) => {
+      urdfModel.removeJoint(removedName);
+    });
+
+    showToast(`Added ${type} joint: ${name}`, 'success');
+
+    // Reset form
+    document.getElementById('joint-name').value = '';
+    document.getElementById('joint-parent').value = '';
+    document.getElementById('joint-child').value = '';
+    axisRow.style.display = 'none';
+    typeSelect.value = 'fixed';
+  });
+}
+
+// ---------------------------------------------------------------------------
+// URDF export
+// ---------------------------------------------------------------------------
+
+function _wireExportButton() {
+  document.getElementById('export-btn').addEventListener('click', async () => {
+    // Ensure all links have a fitted primitive before export
+    for (const link of state.links) {
+      if (!link.primitive) {
+        showToast(`Link '${link.name}' has no fitted primitive. Auto-fitting box...`, 'info');
+        await fitPrimitive(link.name, 'box');
+      }
+    }
+
+    const payload = urdfModel.toExportPayload();
+
+    try {
+      const response = await fetch('/api/urdf/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ detail: 'Export failed' }));
+        showToast(err.detail || 'Export failed', 'error');
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${urdfModel.robotName}.urdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('URDF exported!', 'success');
+    } catch (e) {
+      showToast('Export error: ' + e.message, 'error');
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Initialisation
 // ---------------------------------------------------------------------------
 
@@ -213,6 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
   animate();
   initUI();
   initTransformControls();
+
+  _wireJointForm();
+  _wireExportButton();
 
   // Register transform-change handler once: syncs spec + collision when gizmo dragged
   onTransformChange(() => {
@@ -244,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Dev convenience
 if (typeof window !== 'undefined') {
-  window.__mesh2urdf = { state };
+  window.__mesh2urdf = { state, urdfModel };
 }
 
-export { state };
+export { state, urdfModel };

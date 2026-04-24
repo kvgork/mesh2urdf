@@ -38,8 +38,12 @@ class PrimitiveSpec(BaseModel):
 
 class LinkSpec(BaseModel):
     name: str
+    mesh_filename: str = "mesh.stl"
     primitive: PrimitiveSpec
+    collision_margin: float = 0.05
     mass: float = 1.0
+    origin_xyz: list[float] = Field(default_factory=lambda: [0.0, 0.0, 0.0])
+    origin_rpy: list[float] = Field(default_factory=lambda: [0.0, 0.0, 0.0])
     parent: str | None = None
 
 

@@ -35,6 +35,38 @@
       <section id="joints-section">
         <h3>Joints</h3>
         <div id="joints-list"><p class="empty-hint">Add links first</p></div>
+
+        <details id="add-joint-form" style="margin-top:8px">
+          <summary class="add-joint-summary">+ Add Joint</summary>
+          <div class="joint-form-inner">
+            <label class="joint-form-label">Name
+              <input type="text" id="joint-name" placeholder="joint_1">
+            </label>
+            <label class="joint-form-label">Type
+              <select id="joint-type">
+                <option value="fixed">Fixed</option>
+                <option value="revolute">Revolute</option>
+                <option value="prismatic">Prismatic</option>
+                <option value="continuous">Continuous</option>
+              </select>
+            </label>
+            <label class="joint-form-label">Parent link
+              <select id="joint-parent"><option value="">-- select --</option></select>
+            </label>
+            <label class="joint-form-label">Child link
+              <select id="joint-child"><option value="">-- select --</option></select>
+            </label>
+            <div id="joint-axis-row" class="joint-axis-row" style="display:none">
+              <label class="joint-form-label">Axis</label>
+              <div class="joint-axis-inputs">
+                <label class="joint-form-label">X<input type="number" id="axis-x" value="0" step="0.1"></label>
+                <label class="joint-form-label">Y<input type="number" id="axis-y" value="0" step="0.1"></label>
+                <label class="joint-form-label">Z<input type="number" id="axis-z" value="1" step="0.1"></label>
+              </div>
+            </div>
+            <button id="add-joint-btn" class="btn-primary">Add Joint</button>
+          </div>
+        </details>
       </section>
 
       <section id="export-section">

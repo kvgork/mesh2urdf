@@ -231,3 +231,106 @@ input[type="range"] {
   margin-right: 4px;
   vertical-align: middle;
 }
+
+/* ---------------------------------------------------------------------------
+   Joint creation form
+   --------------------------------------------------------------------------- */
+
+#add-joint-form {
+  background: #0d1b2a;
+  border: 1px solid #0f3460;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.add-joint-summary {
+  cursor: pointer;
+  color: #4a9eda;
+  font-size: 0.85em;
+  user-select: none;
+  list-style: none;
+}
+
+.add-joint-summary::-webkit-details-marker {
+  display: none;
+}
+
+.joint-form-inner {
+  margin-top: 8px;
+}
+
+.joint-form-label {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.83em;
+  color: #a0b8cc;
+}
+
+.joint-form-label input[type="text"],
+.joint-form-label input[type="number"],
+.joint-form-label select {
+  width: 100%;
+  background: #0d1b2a;
+  color: #e0e0e0;
+  border: 1px solid #0f3460;
+  padding: 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.joint-axis-inputs {
+  display: flex;
+  gap: 4px;
+}
+
+.joint-axis-inputs label {
+  flex: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Joint list items
+   --------------------------------------------------------------------------- */
+
+.joint-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 6px;
+  border-radius: 3px;
+  margin: 2px 0;
+  font-size: 12px;
+  background: #0f3460;
+}
+
+.joint-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.joint-type {
+  font-size: 0.8em;
+  color: #4a9eda;
+  text-transform: capitalize;
+}
+
+.joint-parents {
+  font-size: 0.78em;
+  color: #8ab4d4;
+}
+
+.joint-remove-btn {
+  background: none;
+  border: none;
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.joint-remove-btn:hover {
+  color: #e74c3c;
+}

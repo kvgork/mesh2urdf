@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from mesh2urdf.api.mesh import router as mesh_router
 from mesh2urdf.api.primitive import router as primitive_router
+from mesh2urdf.api.urdf import router as urdf_router
 
 app = FastAPI(title="mesh2urdf", version="0.1.0")
 
@@ -28,4 +29,5 @@ async def root():
 
 app.include_router(mesh_router, prefix="/api")
 app.include_router(primitive_router, prefix="/api")
+app.include_router(urdf_router)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")

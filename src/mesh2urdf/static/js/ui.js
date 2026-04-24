@@ -38,10 +38,7 @@ export function setUploadLoading(loading) {
 }
 
 export function init() {
-  // Static UI event bindings handled in app.js
-  document.getElementById('export-btn').addEventListener('click', () => {
-    showToast('Export not yet implemented', 'info');
-  });
+  // Export button handler is wired in app.js after URDFModel is available
 }
 
 // ---------------------------------------------------------------------------
@@ -223,4 +220,81 @@ export function updatePrimitiveEditorSpec(spec) {
   setOrigin('origin-r', spec.origin.rpy[0]);
   setOrigin('origin-p', spec.origin.rpy[1]);
   setOrigin('origin-y', spec.origin.rpy[2]);
+}
+
+// ---------------------------------------------------------------------------
+// Joint UI helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Populate the parent/child link dropdowns in the joint creation form.
+ * Preserves current selection if still valid.
+ * @param {string[]} linkNames - Array of available link names from URDFModel
+ */
+export function updateLinkDropdowns(linkNames) {
+  const parentSel = document.getElementById('joint-parent');
+  const childSel = document.getElementById('joint-child');
+  if (!parentSel || !childSel) return;
+
+  const prevParent = parentSel.value;
+  const prevChild = childSel.value;
+
+  parentSel.innerHTML = '<option value="">-- select --</option>';
+  childSel.innerHTML = '<option value="">-- select --</option>';
+
+  for (const name of linkNames) {
+    const opt1 = document.createElement('option');
+    opt1.value = name;
+    opt1.textContent = name;
+    parentSel.appendChild(opt1);
+
+    const opt2 = document.createElement('option');
+    opt2.value = name;
+    opt2.textContent = name;
+    childSel.appendChild(opt2);
+  }
+
+  // Restore previous selections if still valid
+  if (linkNames.includes(prevParent)) parentSel.value = prevParent;
+  if (linkNames.includes(prevChild)) childSel.value = prevChild;
+}
+
+/**
+ * Append a joint row to the joints list in the sidebar.
+ * @param {string} name
+ * @param {string} type
+ * @param {string} parent
+ * @param {string} child
+ * @param {function} onRemove - Called with (name) when remove button clicked
+ */
+export function addJointToList(name, type, parent, child, onRemove) {
+  const list = document.getElementById('joints-list');
+  const hint = list.querySelector('.empty-hint');
+  if (hint) hint.remove();
+
+  const item = document.createElement('div');
+  item.className = 'joint-item';
+  item.dataset.name = name;
+  item.innerHTML = `
+    <span class="joint-info">
+      <strong>${name}</strong>
+      <span class="joint-type">${type}</span>
+      <span class="joint-parents">${parent} &rarr; ${child}</span>
+    </span>
+    <button class="joint-remove-btn" title="Remove joint">&times;</button>
+  `;
+
+  item.querySelector('.joint-remove-btn').addEventListener('click', () => {
+    item.remove();
+    if (onRemove) onRemove(name);
+    // Restore hint if no joints remain
+    if (!list.querySelector('.joint-item')) {
+      const hint2 = document.createElement('p');
+      hint2.className = 'empty-hint';
+      hint2.textContent = 'Add links first';
+      list.insertBefore(hint2, list.firstChild);
+    }
+  });
+
+  list.appendChild(item);
 }
