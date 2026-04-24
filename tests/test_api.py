@@ -30,6 +30,19 @@ def test_mesh_load_endpoint(test_client: TestClient, cube_stl_path: Path) -> Non
     assert data["vertex_count"] > 0
 
 
+def test_upload_obj_cube(test_client: TestClient, cube_obj_path: Path) -> None:
+    with open(cube_obj_path, "rb") as f:
+        resp = test_client.post(
+            "/api/mesh/load",
+            files={"file": ("cube.obj", f, "application/octet-stream")},
+        )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "mesh_id" in data
+    assert data["vertex_count"] > 0
+    assert data["face_count"] > 0
+
+
 def test_mesh_metadata_endpoint(test_client: TestClient, cube_stl_path: Path) -> None:
     # First upload
     with open(cube_stl_path, "rb") as f:
