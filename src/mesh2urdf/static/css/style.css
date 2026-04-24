@@ -86,11 +86,21 @@ section {
 }
 
 .link-item {
-  padding: 8px;
-  background: #0f3460;
-  border-radius: 4px;
-  margin-bottom: 4px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 3px;
+  margin: 2px 0;
   font-size: 13px;
+  background: #0f3460;
+}
+
+.link-item:hover {
+  background: #1a4a80;
+}
+
+.link-item.selected {
+  background: #1a4a80;
+  border-left: 3px solid #4a9eda;
 }
 
 input[type="file"] {
@@ -151,4 +161,73 @@ input[type="range"] {
   0%   { opacity: 1; }
   70%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* ---------------------------------------------------------------------------
+   Primitive editor panel
+   --------------------------------------------------------------------------- */
+
+#primitive-editor {
+  background: #0d1b2a;
+  border: 1px solid #0f3460;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+#primitive-editor h3 {
+  color: #4a9eda;
+  margin-bottom: 6px;
+}
+
+#primitive-editor label {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85em;
+  color: #a0b8cc;
+}
+
+#primitive-editor .dim-label {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.82em;
+  color: #a0b8cc;
+}
+
+#primitive-editor input[type="number"],
+#primitive-editor select {
+  width: 100%;
+  background: #0d1b2a;
+  color: #e0e0e0;
+  border: 1px solid #0f3460;
+  padding: 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+#primitive-editor input[type="range"] {
+  width: 100%;
+  background: transparent;
+  margin-top: 4px;
+}
+
+#primitive-editor .input-row {
+  display: flex;
+  gap: 4px;
+}
+
+#primitive-editor .input-row label {
+  flex: 1;
+}
+
+/* Visual = green, Collision = red legend hint */
+#primitive-editor::before {
+  content: "Visual ";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #00ff88;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
 }
