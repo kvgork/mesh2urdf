@@ -4,16 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mesh2urdf</title>
-  <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 4rem auto; padding: 0 1rem; }
-    h1 { color: #333; }
-    p { color: #666; }
-    code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
-  </style>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
-  <h1>mesh2urdf</h1>
-  <p>Phase 1 placeholder — the full web UI will be implemented in Phase 3.</p>
-  <p>Backend API is running. Try <a href="/healthz"><code>/healthz</code></a> to verify.</p>
+  <div id="app">
+    <div id="viewport-container"></div>
+    <div id="sidebar">
+      <h2>mesh2urdf</h2>
+
+      <section id="upload-section">
+        <h3>Load Mesh</h3>
+        <input type="file" id="mesh-file-input" accept=".stl,.obj">
+        <button id="upload-btn" class="btn-primary">Upload</button>
+        <div id="upload-status"></div>
+      </section>
+
+      <section id="links-section">
+        <h3>Links</h3>
+        <div id="links-list"><p class="empty-hint">Upload a mesh to get started</p></div>
+      </section>
+
+      <section id="joints-section">
+        <h3>Joints</h3>
+        <div id="joints-list"><p class="empty-hint">Add links first</p></div>
+      </section>
+
+      <section id="export-section">
+        <button id="export-btn" class="btn-primary" disabled>Export URDF</button>
+      </section>
+    </div>
+  </div>
+  <div id="toast-container"></div>
+  <script type="module" src="/static/js/app.js"></script>
 </body>
 </html>
