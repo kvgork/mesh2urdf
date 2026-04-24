@@ -28,8 +28,7 @@ def _minimal_payload(robot_name: str = "robot") -> dict:
                 "primitive": {
                     "type": "box",
                     "dimensions": {"size_x": 0.2, "size_y": 0.1, "size_z": 0.05},
-                    "origin_xyz": [0.0, 0.0, 0.0],
-                    "origin_rpy": [0.0, 0.0, 0.0],
+                    "origin": {"xyz": [0.0, 0.0, 0.0], "rpy": [0.0, 0.0, 0.0]},
                 },
                 "collision_margin": 0.05,
                 "origin_xyz": [0.0, 0.0, 0.0],
@@ -50,8 +49,7 @@ def _two_link_payload() -> dict:
                 "primitive": {
                     "type": "box",
                     "dimensions": {"size_x": 0.2, "size_y": 0.1, "size_z": 0.05},
-                    "origin_xyz": [0.0, 0.0, 0.0],
-                    "origin_rpy": [0.0, 0.0, 0.0],
+                    "origin": {"xyz": [0.0, 0.0, 0.0], "rpy": [0.0, 0.0, 0.0]},
                 },
                 "collision_margin": 0.05,
                 "origin_xyz": [0.0, 0.0, 0.0],
@@ -63,8 +61,7 @@ def _two_link_payload() -> dict:
                 "primitive": {
                     "type": "sphere",
                     "dimensions": {"radius": 0.05},
-                    "origin_xyz": [0.0, 0.0, 0.0],
-                    "origin_rpy": [0.0, 0.0, 0.0],
+                    "origin": {"xyz": [0.0, 0.0, 0.0], "rpy": [0.0, 0.0, 0.0]},
                 },
                 "collision_margin": 0.0,
                 "origin_xyz": [0.0, 0.0, 0.1],

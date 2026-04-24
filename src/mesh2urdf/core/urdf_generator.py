@@ -73,8 +73,8 @@ def _build_link(link: LinkSpec) -> ET.Element:
     # Collision — scaled primitive
     coll = ET.SubElement(el, "collision")
     coll_origin = ET.SubElement(coll, "origin")
-    coll_origin.set("xyz", _fmt_xyz(link.primitive.origin_xyz))
-    coll_origin.set("rpy", _fmt_rpy(link.primitive.origin_rpy))
+    coll_origin.set("xyz", _fmt_xyz(link.primitive.origin.get("xyz", [0.0, 0.0, 0.0])))
+    coll_origin.set("rpy", _fmt_rpy(link.primitive.origin.get("rpy", [0.0, 0.0, 0.0])))
     scaled = scale_primitive(link.primitive, link.collision_margin)
     coll.append(_build_geometry(scaled))
 

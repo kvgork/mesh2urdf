@@ -44,8 +44,8 @@ def test_fit_box_via_api(client: TestClient, cube_mesh_id: str) -> None:
     assert "size_x" in data["dimensions"]
     assert "size_y" in data["dimensions"]
     assert "size_z" in data["dimensions"]
-    assert len(data["origin_xyz"]) == 3
-    assert len(data["origin_rpy"]) == 3
+    assert len(data["origin"]["xyz"]) == 3
+    assert len(data["origin"]["rpy"]) == 3
 
 
 def test_fit_sphere_via_api(client: TestClient, cube_mesh_id: str) -> None:

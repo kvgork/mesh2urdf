@@ -33,8 +33,7 @@ def _make_box_spec(
         primitive=PrimitiveSpec(
             type="box",
             dimensions={"size_x": 0.2, "size_y": 0.1, "size_z": 0.05},
-            origin_xyz=[0.0, 0.0, 0.025],
-            origin_rpy=[0.0, 0.0, 0.0],
+            origin={"xyz": [0.0, 0.0, 0.025], "rpy": [0.0, 0.0, 0.0]},
         ),
         collision_margin=margin,
         origin_xyz=[0.0, 0.0, 0.0],

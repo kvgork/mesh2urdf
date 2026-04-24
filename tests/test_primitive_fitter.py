@@ -34,10 +34,10 @@ def test_fit_box_unit_cube() -> None:
     assert spec.dimensions["size_x"] == pytest.approx(1.0, abs=1e-9)
     assert spec.dimensions["size_y"] == pytest.approx(1.0, abs=1e-9)
     assert spec.dimensions["size_z"] == pytest.approx(1.0, abs=1e-9)
-    assert spec.origin_xyz[0] == pytest.approx(0.5, abs=1e-9)
-    assert spec.origin_xyz[1] == pytest.approx(0.5, abs=1e-9)
-    assert spec.origin_xyz[2] == pytest.approx(0.5, abs=1e-9)
-    assert spec.origin_rpy == [0.0, 0.0, 0.0]
+    assert spec.origin["xyz"][0] == pytest.approx(0.5, abs=1e-9)
+    assert spec.origin["xyz"][1] == pytest.approx(0.5, abs=1e-9)
+    assert spec.origin["xyz"][2] == pytest.approx(0.5, abs=1e-9)
+    assert spec.origin["rpy"] == [0.0, 0.0, 0.0]
 
 
 def test_fit_box_empty_mesh_raises() -> None:
@@ -60,7 +60,7 @@ def test_fit_sphere() -> None:
     assert spec.type == "sphere"
     assert spec.dimensions["radius"] == pytest.approx(0.5, rel=0.02)
     # Center should be near origin.
-    assert np.linalg.norm(spec.origin_xyz) == pytest.approx(0.0, abs=0.02)
+    assert np.linalg.norm(spec.origin["xyz"]) == pytest.approx(0.0, abs=0.02)
 
 
 def test_fit_sphere_fallback() -> None:
@@ -73,7 +73,7 @@ def test_fit_sphere_fallback() -> None:
 
     assert spec.type == "sphere"
     assert spec.dimensions["radius"] > 0.0
-    assert len(spec.origin_xyz) == 3
+    assert len(spec.origin["xyz"]) == 3
 
 
 # ---------------------------------------------------------------------------
@@ -90,7 +90,7 @@ def test_fit_cylinder() -> None:
     assert spec.dimensions["radius"] == pytest.approx(0.3, rel=0.05)
     assert spec.dimensions["length"] == pytest.approx(1.0, rel=0.05)
     # Axis is Z → rpy should be [0,0,0] (degenerate parallel case).
-    assert spec.origin_rpy == pytest.approx([0.0, 0.0, 0.0], abs=1e-9)
+    assert spec.origin["rpy"] == pytest.approx([0.0, 0.0, 0.0], abs=1e-9)
 
 
 # ---------------------------------------------------------------------------
@@ -110,15 +110,15 @@ def test_scale_primitive_box() -> None:
 
 
 def test_scale_preserves_origin() -> None:
-    """Scaling must not change origin_xyz or origin_rpy for any primitive type."""
+    """Scaling must not change origin xyz or rpy for any primitive type."""
     box_mesh = trimesh.creation.box(extents=[1.0, 1.0, 1.0])
     sphere_mesh = trimesh.creation.icosphere(subdivisions=3, radius=1.0)
     cyl_mesh = trimesh.creation.cylinder(radius=0.3, height=1.0)
 
     for spec in [fit_box(box_mesh), fit_sphere(sphere_mesh), fit_cylinder(cyl_mesh)]:
         scaled = scale_primitive(spec, margin=0.15)
-        assert scaled.origin_xyz == pytest.approx(spec.origin_xyz, abs=1e-12)
-        assert scaled.origin_rpy == pytest.approx(spec.origin_rpy, abs=1e-12)
+        assert scaled.origin["xyz"] == pytest.approx(spec.origin["xyz"], abs=1e-12)
+        assert scaled.origin["rpy"] == pytest.approx(spec.origin["rpy"], abs=1e-12)
 
 
 def test_scale_sphere() -> None:
@@ -146,8 +146,7 @@ def test_scale_unknown_type_raises() -> None:
     spec = PrimitiveSpec.model_construct(
         type="capsule",
         dimensions={"radius": 1.0},
-        origin_xyz=[0.0, 0.0, 0.0],
-        origin_rpy=[0.0, 0.0, 0.0],
+        origin={"xyz": [0.0, 0.0, 0.0], "rpy": [0.0, 0.0, 0.0]},
     )
     with pytest.raises(ValueError, match="Unknown"):
         scale_primitive(spec, margin=0.1)
@@ -167,4 +166,4 @@ def test_fit_cylinder_rotated() -> None:  # pragma: no cover
     mesh.apply_transform(rot)
     spec = fit_cylinder(mesh)
     # The pitch (rpy[1]) should be approximately ±45°.
-    assert abs(spec.origin_rpy[1]) == pytest.approx(angle, abs=0.05)
+    assert abs(spec.origin["rpy"][1]) == pytest.approx(angle, abs=0.05)

@@ -39,8 +39,7 @@ def fit_box(mesh: trimesh.Trimesh) -> PrimitiveSpec:
     return PrimitiveSpec(
         type="box",
         dimensions={"size_x": size[0], "size_y": size[1], "size_z": size[2]},
-        origin_xyz=center,
-        origin_rpy=[0.0, 0.0, 0.0],
+        origin={"xyz": center, "rpy": [0.0, 0.0, 0.0]},
     )
 
 
@@ -80,8 +79,7 @@ def fit_sphere(mesh: trimesh.Trimesh) -> PrimitiveSpec:
     return PrimitiveSpec(
         type="sphere",
         dimensions={"radius": radius},
-        origin_xyz=center,
-        origin_rpy=[0.0, 0.0, 0.0],
+        origin={"xyz": center, "rpy": [0.0, 0.0, 0.0]},
     )
 
 
@@ -150,8 +148,7 @@ def fit_cylinder(mesh: trimesh.Trimesh) -> PrimitiveSpec:
     return PrimitiveSpec(
         type="cylinder",
         dimensions={"radius": radius, "length": length},
-        origin_xyz=center.tolist(),
-        origin_rpy=rpy,
+        origin={"xyz": center.tolist(), "rpy": rpy},
     )
 
 
@@ -191,6 +188,5 @@ def scale_primitive(spec: PrimitiveSpec, margin: float) -> PrimitiveSpec:
     return PrimitiveSpec(
         type=spec.type,
         dimensions=new_dims,
-        origin_xyz=list(spec.origin_xyz),
-        origin_rpy=list(spec.origin_rpy),
+        origin=dict(spec.origin),
     )
